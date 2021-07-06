@@ -1,1 +1,86 @@
-// TODO
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 2rem;
+
+  .buttonPosts {
+    height: 1.5rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.361px;
+    background-color: var(--background);
+    border: none;
+    color: var(--pink);
+    transition: filter 0.2s;
+
+    &:hover {
+      filter: opacity(0.5);
+    }
+  }
+}
+
+.postsContainer {
+  width: 960px;
+
+  a {
+    cursor: pointer;
+  }
+  .post {
+    margin-bottom: 3rem;
+
+    &:hover {
+      h1 {
+        color: var(--pink);
+      }
+    }
+
+    h1 {
+      font-weight: 700;
+      font-size: 1.75rem;
+      line-height: 2.118rem;
+      margin-bottom: 0.5rem;
+      color: var(--gray-light);
+      transition: color 0.2s;
+    }
+    p {
+      font-weight: 400;
+      font-size: 1.125rem;
+      color: var(--gray-subtitle);
+      line-height: 1.361rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .infoGroup {
+      display: flex;
+      flex-direction: row;
+
+      .dateGroup {
+        display: flex;
+        flex-direction: row;
+        time {
+          display: block;
+          font-size: 0.875rem;
+          color: var(--gray-medium);
+          line-height: 1.059rem;
+          font-weight: 400;
+          margin-left: 0.5rem;
+        }
+      }
+
+      .authorGroup {
+        display: flex;
+        flex-direction: row;
+        margin-left: 1.5rem;
+
+        span {
+          display: block;
+          font-size: 0.875rem;
+          color: var(--gray-medium);
+          line-height: 1.059rem;
+          font-weight: 400;
+          margin-left: 0.5rem;
+        }
+      }
+    }
+  }
+}
