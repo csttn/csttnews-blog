@@ -86,7 +86,7 @@ export default function Home({
       <main className={styles.container}>
         <div className={styles.postsContainer}>
           {posts.map(post => (
-            <a key={post.uid}>
+            <div key={post.uid}>
               <Link href={`/post/${post.uid}`}>
                 <div className={styles.post}>
                   <h1>{post.data.title}</h1>
@@ -94,7 +94,9 @@ export default function Home({
                   <div className={styles.infoGroup}>
                     <div className={styles.dateGroup}>
                       <FiCalendar />
-                      <time>{post.first_publication_date}</time>
+                      <time>
+                        {PrismicFormatDate(post.first_publication_date)}
+                      </time>
                     </div>
                     <div className={styles.authorGroup}>
                       <FiUser />
@@ -103,7 +105,7 @@ export default function Home({
                   </div>
                 </div>
               </Link>
-            </a>
+            </div>
           ))}
         </div>
         {nextPage && (
@@ -131,7 +133,7 @@ export const getStaticProps: GetStaticProps = async () => {
   const results = postsResponse.results.map(post => {
     return {
       uid: post.uid,
-      first_publication_date: PrismicFormatDate(post.first_publication_date),
+      first_publication_date: post.first_publication_date,
       data: {
         title: post.data.title,
         subtitle: post.data.subtitle,

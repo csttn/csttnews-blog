@@ -12,7 +12,8 @@ import { FiCalendar, FiUser, FiClock } from 'react-icons/fi';
 import { data } from '../../utils/data';
 
 interface Post {
-  first_publication_date: string | null;
+  uid?: string;
+  first_publication_date: string;
   data: {
     title: string;
     banner: {
@@ -38,12 +39,6 @@ export default function Post({ post }: PostProps) {
   const [content, setContent] = useState([]);
 
   useEffect(() => {
-    if (content) {
-      setLoading(false);
-    }
-  }, [content]);
-
-  useEffect(() => {
     formatContent();
   }, []);
 
@@ -57,6 +52,7 @@ export default function Post({ post }: PostProps) {
     });
 
     setContent(contentFormated);
+    setLoading(false);
   }
 
   return (
@@ -67,46 +63,41 @@ export default function Post({ post }: PostProps) {
         <img src={post.data.banner.url} alt="img" />
       </div>
       <main className={styles.container}>
-        {loading ? (
-          <span className={styles.loading}>Carregando...</span>
-        ) : (
-          <article className={styles.post}>
-            <h1 className={styles.title}>{post.data.title}</h1>
-            <div className={styles.infoGroup}>
-              <div className={styles.dataInfo}>
-                <FiCalendar className={styles.dataIcon} size="20" />
-                <span>{post.first_publication_date}</span>
-              </div>
-              <div className={styles.authorInfo}>
-                <FiUser className={styles.userIcon} size="20" />
-                <span>{post.data.author}</span>
-              </div>
-              <div className={styles.timeInfo}>
-                <FiClock className={styles.clockIcon} size="20" />
-                <time>4 min</time>
-              </div>
+        <article className={styles.post}>
+          <h1 className={styles.title}>{post.data.title}</h1>
+          <div className={styles.infoGroup}>
+            <div className={styles.dataInfo}>
+              <FiCalendar className={styles.dataIcon} size="20" />
+              <span>{PrismicFormatDate(post.first_publication_date)}</span>
             </div>
+            <div className={styles.authorInfo}>
+              <FiUser className={styles.userIcon} size="20" />
+              <span>{post.data.author}</span>
+            </div>
+            <div className={styles.timeInfo}>
+              <FiClock className={styles.clockIcon} size="20" />
+              <time>4 min</time>
+            </div>
+          </div>
 
-            {content.map(postItem => (
-              <>
-                <h2 key={postItem.heading}>{postItem.heading}</h2>
+          {content.map(postItem => (
+            <>
+              <h2 key={postItem.heading}>{postItem.heading}</h2>
 
-                {postItem.body.map(body => {
-                  console.log(body.text);
-                  return (
-                    <div
-                      key={body.text}
-                      className={styles.postContent}
-                      dangerouslySetInnerHTML={{
-                        __html: body.text,
-                      }}
-                    />
-                  );
-                })}
-              </>
-            ))}
-          </article>
-        )}
+              {postItem.body.map(body => {
+                return (
+                  <div
+                    key={body.text}
+                    className={styles.postContent}
+                    dangerouslySetInnerHTML={{
+                      __html: body.text,
+                    }}
+                  />
+                );
+              })}
+            </>
+          ))}
+        </article>
       </main>
     </>
   );
