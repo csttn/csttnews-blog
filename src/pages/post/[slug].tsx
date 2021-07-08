@@ -8,6 +8,8 @@ import { RichText } from 'prismic-dom';
 
 import Header from '../../components/Header';
 import styles from './post.module.scss';
+import { FiCalendar, FiUser, FiClock } from 'react-icons/fi';
+import { data } from '../../utils/data';
 
 interface Post {
   first_publication_date: string | null;
@@ -33,11 +35,29 @@ interface PostProps {
 export default function Post({ post }: PostProps) {
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {}, []);
+  const [content, setContent] = useState([]);
 
-  console.log(post);
+  useEffect(() => {
+    if (content) {
+      setLoading(false);
+    }
+  }, [content]);
 
-  // pegar dados curs, formatar e exibir conforme teste
+  useEffect(() => {
+    formatContent();
+  }, []);
+
+  function formatContent() {
+    const contentFormated = post.data.content.map(contentItem => {
+      if (contentItem.body)
+        return {
+          heading: contentItem.heading,
+          body: [{ text: RichText.asHtml(contentItem.body) }],
+        };
+    });
+
+    setContent(contentFormated);
+  }
 
   return (
     <>
@@ -47,22 +67,46 @@ export default function Post({ post }: PostProps) {
         <img src={post.data.banner.url} alt="img" />
       </div>
       <main className={styles.container}>
-        <article className={styles.post}>
-          {post.data.content.map(post => (
-            <div key={post.heading}>
-              <h1>{post.heading}</h1>
-
-              {post.body.map(body => (
-                <div
-                  className={styles.postContent}
-                  dangerouslySetInnerHTML={{
-                    __html: body.text,
-                  }}
-                />
-              ))}
+        {loading ? (
+          <span className={styles.loading}>Carregando...</span>
+        ) : (
+          <article className={styles.post}>
+            <h1 className={styles.title}>{post.data.title}</h1>
+            <div className={styles.infoGroup}>
+              <div className={styles.dataInfo}>
+                <FiCalendar className={styles.dataIcon} size="20" />
+                <span>{post.first_publication_date}</span>
+              </div>
+              <div className={styles.authorInfo}>
+                <FiUser className={styles.userIcon} size="20" />
+                <span>{post.data.author}</span>
+              </div>
+              <div className={styles.timeInfo}>
+                <FiClock className={styles.clockIcon} size="20" />
+                <time>4 min</time>
+              </div>
             </div>
-          ))}
-        </article>
+
+            {content.map(postItem => (
+              <>
+                <h2 key={postItem.heading}>{postItem.heading}</h2>
+
+                {postItem.body.map(body => {
+                  console.log(body.text);
+                  return (
+                    <div
+                      key={body.text}
+                      className={styles.postContent}
+                      dangerouslySetInnerHTML={{
+                        __html: body.text,
+                      }}
+                    />
+                  );
+                })}
+              </>
+            ))}
+          </article>
+        )}
       </main>
     </>
   );
@@ -82,23 +126,23 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   const response = await prismic.getByUID('posts', String(slug), {});
 
-  // mandar dados formatos para o front
-  const content = response.data.content.map(content => {
-    return {
-      heading: content.heading,
-      body: [{ text: [RichText.asHtml(content.body)] }],
-    };
-  });
+  // const content = response.data.content.map(content => {
+  //   return {
+  //     heading: content.heading,
+  //     body: [RichText.asHtml(content.body)],
+  //   };
+  // });
 
   const post = {
     first_publication_date: PrismicFormatDate(response.first_publication_date),
     data: {
       title: response.data.title,
+      subtitle: response.data.subtitle,
       banner: {
         url: response.data.banner.url,
       },
       author: response.data.author,
-      content: content,
+      content: response.data.content,
     },
   };
 

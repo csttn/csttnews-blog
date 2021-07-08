@@ -15,7 +15,7 @@ import Link from 'next/link';
 import { FiCalendar, FiUser } from 'react-icons/fi';
 
 interface Post {
-  slug: string;
+  uid?: string;
   first_publication_date: string | null;
   data: {
     title: string;
@@ -23,10 +23,12 @@ interface Post {
     author: string;
   };
 }
+
 interface PostPagination {
   next_page: string;
   results: Post[];
 }
+
 interface HomeProps {
   postsPagination: PostPagination;
 }
@@ -84,8 +86,8 @@ export default function Home({
       <main className={styles.container}>
         <div className={styles.postsContainer}>
           {posts.map(post => (
-            <a key={post.slug}>
-              <Link href={`/post/${post.slug}`}>
+            <a key={post.uid}>
+              <Link href={`/post/${post.uid}`}>
                 <div className={styles.post}>
                   <h1>{post.data.title}</h1>
                   <p>{post.data.subtitle}</p>
@@ -128,7 +130,7 @@ export const getStaticProps: GetStaticProps = async () => {
 
   const results = postsResponse.results.map(post => {
     return {
-      slug: post.uid,
+      uid: post.uid,
       first_publication_date: PrismicFormatDate(post.first_publication_date),
       data: {
         title: post.data.title,
