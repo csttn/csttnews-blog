@@ -10,6 +10,8 @@ import { PrismicFormatDate } from '../utils/dateFormat';
 import Header from '../components/Header';
 import styles from './home.module.scss';
 
+import Link from 'next/link';
+
 import { FiCalendar, FiUser } from 'react-icons/fi';
 
 interface Post {
@@ -38,7 +40,6 @@ export default function Home({
   const [loading, setLoading] = useState(false);
   async function loadPosts() {
     setLoading(true);
-
     const token =
       'MC5ZT1JucWhFQUFDMEFKQ2xG.DO-_ve-_ve-_ve-_ve-_ve-_ve-_vUFA77-977-9Bj1E77-9Xi4EaAfvv71re--_ve-_vTce77-977-9ee-_vQ';
     const url = `${nextPage}&access_token=${token}`;
@@ -65,7 +66,6 @@ export default function Home({
           const newPosts = posts.concat(postsPagination);
           setPosts(newPosts);
           setNextPage(next_page);
-          console.log(next_page);
         });
       })
       .catch(error => {
@@ -85,20 +85,22 @@ export default function Home({
         <div className={styles.postsContainer}>
           {posts.map(post => (
             <a key={post.slug}>
-              <div className={styles.post}>
-                <h1>{post.data.title}</h1>
-                <p>{post.data.subtitle}</p>
-                <div className={styles.infoGroup}>
-                  <div className={styles.dateGroup}>
-                    <FiCalendar />
-                    <time>{post.first_publication_date}</time>
-                  </div>
-                  <div className={styles.authorGroup}>
-                    <FiUser />
-                    <span>{post.data.author}</span>
+              <Link href={`/post/${post.slug}`}>
+                <div className={styles.post}>
+                  <h1>{post.data.title}</h1>
+                  <p>{post.data.subtitle}</p>
+                  <div className={styles.infoGroup}>
+                    <div className={styles.dateGroup}>
+                      <FiCalendar />
+                      <time>{post.first_publication_date}</time>
+                    </div>
+                    <div className={styles.authorGroup}>
+                      <FiUser />
+                      <span>{post.data.author}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             </a>
           ))}
         </div>
@@ -117,7 +119,7 @@ export const getStaticProps: GetStaticProps = async () => {
   const postsResponse = await prismic.query(
     [Prismic.Predicates.at('document.type', 'posts')],
     {
-      fetch: ['post.title', 'post.content'],
+      fetch: ['publication.title', 'publication.content'],
       pageSize: 3,
       orderings: '[post.date desc]',
     }
