@@ -53,10 +53,8 @@ export default function Home({
 
           const postsPagination = results.map(post => {
             return {
-              slug: post.uid,
-              first_publication_date: PrismicFormatDate(
-                post.first_publication_date
-              ),
+              uid: post.uid,
+              first_publication_date: post.first_publication_date,
               data: {
                 title: post.data.title,
                 subtitle: post.data.subtitle,
