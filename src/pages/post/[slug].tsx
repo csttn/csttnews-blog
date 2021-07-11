@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { GetServerSideProps, GetStaticPaths, GetStaticProps } from 'next';
+import { GetStaticPaths, GetStaticProps } from 'next';
 
+import Prismic from '@prismicio/client';
 import { getPrismicClient } from '../../services/prismic';
+
 import { PrismicFormatDate } from '../../utils/dateFormat';
 
 import { RichText } from 'prismic-dom';
@@ -9,7 +11,6 @@ import { RichText } from 'prismic-dom';
 import Header from '../../components/Header';
 import styles from './post.module.scss';
 import { FiCalendar, FiUser, FiClock } from 'react-icons/fi';
-import { data } from '../../utils/data';
 
 interface Post {
   uid?: string;
@@ -54,7 +55,6 @@ export default function Post({ post }: PostProps) {
     setContent(contentFormated);
     setLoading(false);
   }
-
   return (
     <>
       <Header />
@@ -81,13 +81,13 @@ export default function Post({ post }: PostProps) {
           </div>
 
           {content.map(postItem => (
-            <>
-              <h2 key={postItem.heading}>{postItem.heading}</h2>
+            <main key={postItem.heading}>
+              <h2>{postItem.heading}</h2>
 
               {postItem.body.map(body => {
                 return (
                   <div
-                    key={body.text}
+                    key={body}
                     className={styles.postContent}
                     dangerouslySetInnerHTML={{
                       __html: body.text,
@@ -95,7 +95,7 @@ export default function Post({ post }: PostProps) {
                   />
                 );
               })}
-            </>
+            </main>
           ))}
         </article>
       </main>
@@ -104,8 +104,39 @@ export default function Post({ post }: PostProps) {
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
+  const prismic = getPrismicClient();
+
+  const postsResponse = await prismic.query(
+    [Prismic.Predicates.at('document.type', 'posts')],
+    {
+      fetch: ['publication.title', 'publication.content'],
+      pageSize: 3,
+      orderings: '[post.date desc]',
+    }
+  );
+
+  const slugs = postsResponse.results.map((post, index) => {
+    return { slug: post.uid };
+  });
+
   return {
-    paths: [],
+    paths: [
+      {
+        params: {
+          slug: slugs[0].slug,
+        },
+      },
+      {
+        params: {
+          slug: slugs[1].slug,
+        },
+      },
+      {
+        params: {
+          slug: slugs[2].slug,
+        },
+      },
+    ],
     fallback: 'blocking',
   };
 };

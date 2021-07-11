@@ -93,13 +93,13 @@ export default function Home({
                   <p>{post.data.subtitle}</p>
                   <div className={styles.infoGroup}>
                     <div className={styles.dateGroup}>
-                      <FiCalendar />
+                      <FiCalendar className={styles.IconCalendar} />
                       <time>
                         {PrismicFormatDate(post.first_publication_date)}
                       </time>
                     </div>
                     <div className={styles.authorGroup}>
-                      <FiUser />
+                      <FiUser className={styles.IconUser} />
                       <span>{post.data.author}</span>
                     </div>
                   </div>
