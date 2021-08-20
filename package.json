@@ -10,9 +10,13 @@
     "coverage": "jest --coverage"
   },
   "dependencies": {
+    "@chakra-ui/react": "^1.6.6",
+    "@emotion/react": "^11",
+    "@emotion/styled": "^11",
     "@prismicio/client": "^4.0.0",
     "axios": "^0.21.1",
     "date-fns": "^2.19.0",
+    "framer-motion": "^4",
     "next": "10.0.7",
     "prismic-dom": "^2.2.5",
     "react": "17.0.1",

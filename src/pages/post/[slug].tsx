@@ -1,16 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { GetStaticPaths, GetStaticProps } from 'next';
-
 import Prismic from '@prismicio/client';
-import { getPrismicClient } from '../../services/prismic';
-
-import { PrismicFormatDate } from '../../utils/dateFormat';
-
+import { GetStaticPaths, GetStaticProps } from 'next';
 import { RichText } from 'prismic-dom';
-
+import React, { useEffect, useState } from 'react';
+import { FiCalendar, FiClock, FiUser } from 'react-icons/fi';
 import Header from '../../components/Header';
+import { getPrismicClient } from '../../services/prismic';
+import { PrismicFormatDate } from '../../utils/dateFormat';
 import styles from './post.module.scss';
-import { FiCalendar, FiUser, FiClock } from 'react-icons/fi';
 
 interface Post {
   uid?: string;
@@ -41,9 +37,9 @@ export default function Post({ post }: PostProps) {
 
   useEffect(() => {
     formatContent();
-  }, []);
+  }, [post]);
 
-  function formatContent() {
+  const formatContent = () => {
     const contentFormated = post.data.content.map(contentItem => {
       if (contentItem.body)
         return {
@@ -51,54 +47,61 @@ export default function Post({ post }: PostProps) {
           body: [{ text: RichText.asHtml(contentItem.body) }],
         };
     });
-
     setContent(contentFormated);
     setLoading(false);
-  }
+  };
+
+  const renderContent = () => {
+    return (
+      <>
+        <div className={styles.postImage}>
+          <img src={post.data.banner.url} alt="img" />
+        </div>
+        <main className={styles.container}>
+          <article className={styles.post}>
+            <h1 className={styles.title}>{post.data.title}</h1>
+            <div className={styles.infoGroup}>
+              <div className={styles.dataInfo}>
+                <FiCalendar className={styles.dataIcon} size="20" />
+                <span>{PrismicFormatDate(post.first_publication_date)}</span>
+              </div>
+              <div className={styles.authorInfo}>
+                <FiUser className={styles.userIcon} size="20" />
+                <span>{post.data.author}</span>
+              </div>
+              <div className={styles.timeInfo}>
+                <FiClock className={styles.clockIcon} size="20" />
+                <time>4 min</time>
+              </div>
+            </div>
+
+            {content.map(postItem => (
+              <main key={postItem.heading}>
+                <h2>{postItem.heading}</h2>
+
+                {postItem.body.map(body => {
+                  return (
+                    <div
+                      key={body}
+                      className={styles.postContent}
+                      dangerouslySetInnerHTML={{
+                        __html: body.text,
+                      }}
+                    />
+                  );
+                })}
+              </main>
+            ))}
+          </article>
+        </main>
+      </>
+    );
+  };
+
   return (
     <>
       <Header />
-
-      <div className={styles.postImage}>
-        <img src={post.data.banner.url} alt="img" />
-      </div>
-      <main className={styles.container}>
-        <article className={styles.post}>
-          <h1 className={styles.title}>{post.data.title}</h1>
-          <div className={styles.infoGroup}>
-            <div className={styles.dataInfo}>
-              <FiCalendar className={styles.dataIcon} size="20" />
-              <span>{PrismicFormatDate(post.first_publication_date)}</span>
-            </div>
-            <div className={styles.authorInfo}>
-              <FiUser className={styles.userIcon} size="20" />
-              <span>{post.data.author}</span>
-            </div>
-            <div className={styles.timeInfo}>
-              <FiClock className={styles.clockIcon} size="20" />
-              <time>4 min</time>
-            </div>
-          </div>
-
-          {content.map(postItem => (
-            <main key={postItem.heading}>
-              <h2>{postItem.heading}</h2>
-
-              {postItem.body.map(body => {
-                return (
-                  <div
-                    key={body}
-                    className={styles.postContent}
-                    dangerouslySetInnerHTML={{
-                      __html: body.text,
-                    }}
-                  />
-                );
-              })}
-            </main>
-          ))}
-        </article>
-      </main>
+      {renderContent()}
     </>
   );
 }

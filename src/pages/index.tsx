@@ -1,18 +1,15 @@
-import React, { useState } from 'react';
-
-import Head from 'next/head';
-import { GetStaticProps } from 'next';
-
-import { getPrismicClient } from '../services/prismic';
+import { Spinner } from '@chakra-ui/react';
 import Prismic from '@prismicio/client';
-import { PrismicFormatDate } from '../utils/dateFormat';
-
-import Header from '../components/Header';
-import styles from './home.module.scss';
-
+import { GetStaticProps } from 'next';
+import Head from 'next/head';
 import Link from 'next/link';
-
+import React, { useState } from 'react';
 import { FiCalendar, FiUser } from 'react-icons/fi';
+import Header from '../components/Header';
+import { loadPostsService } from '../services/postService';
+import { getPrismicClient } from '../services/prismic';
+import { PrismicFormatDate } from '../utils/dateFormat';
+import styles from './home.module.scss';
 
 interface Post {
   uid?: string;
@@ -40,47 +37,18 @@ export default function Home({
   const [nextPage, setNextPage] = useState(next_page);
 
   const [loading, setLoading] = useState(false);
-  async function loadPosts() {
-    setLoading(true);
-    const token =
-      'MC5ZT1JucWhFQUFDMEFKQ2xG.DO-_ve-_ve-_ve-_ve-_ve-_ve-_vUFA77-977-9Bj1E77-9Xi4EaAfvv71re--_ve-_vTce77-977-9ee-_vQ';
-    const url = `${nextPage}&access_token=${token}`;
 
-    await fetch(url)
-      .then(response => {
-        response.json().then(data => {
-          const { next_page, results } = data;
+  const loadPosts = async () => {
+    const { postsData, next_page } = await loadPostsService(nextPage);
 
-          const postsPagination = results.map(post => {
-            return {
-              uid: post.uid,
-              first_publication_date: post.first_publication_date,
-              data: {
-                title: post.data.title,
-                subtitle: post.data.subtitle,
-                author: post.data.author,
-              },
-            };
-          });
+    const newPosts = posts.concat(postsData);
+    setPosts(newPosts);
+    setNextPage(next_page);
+    setLoading(false);
+  };
 
-          const newPosts = posts.concat(postsPagination);
-          setPosts(newPosts);
-          setNextPage(next_page);
-        });
-      })
-      .catch(error => {
-        return console.log(error);
-      });
-  }
-
-  return (
-    <>
-      <Head>
-        <title>Posts | Csttnew</title>
-      </Head>
-
-      <Header />
-
+  const renderContent = (): JSX.Element => {
+    return (
       <main className={styles.container}>
         <div className={styles.postsContainer}>
           {posts.map(post => (
@@ -112,6 +80,18 @@ export default function Home({
           </button>
         )}
       </main>
+    );
+  };
+
+  return (
+    <>
+      <Head>
+        <title>Posts | Csttnew</title>
+      </Head>
+
+      <Header />
+
+      {loading ? <Spinner size="xl" color="red.500" /> : renderContent()}
     </>
   );
 }
