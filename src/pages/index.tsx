@@ -2,13 +2,11 @@ import { Spinner } from '@chakra-ui/react';
 import Prismic from '@prismicio/client';
 import { GetStaticProps } from 'next';
 import Head from 'next/head';
-import Link from 'next/link';
 import React, { useState } from 'react';
-import { FiCalendar, FiUser } from 'react-icons/fi';
 import Header from '../components/Header';
+import { PostCard } from '../components/PostCard';
 import { loadPostsService } from '../services/postService';
 import { getPrismicClient } from '../services/prismic';
-import { PrismicFormatDate } from '../utils/dateFormat';
 import styles from './home.module.scss';
 
 interface Post {
@@ -52,26 +50,7 @@ export default function Home({
       <main className={styles.container}>
         <div className={styles.postsContainer}>
           {posts.map(post => (
-            <div key={post.uid}>
-              <Link href={`/post/${post.uid}`}>
-                <div className={styles.post}>
-                  <h1>{post.data.title}</h1>
-                  <p>{post.data.subtitle}</p>
-                  <div className={styles.infoGroup}>
-                    <div className={styles.dateGroup}>
-                      <FiCalendar className={styles.IconCalendar} />
-                      <time>
-                        {PrismicFormatDate(post.first_publication_date)}
-                      </time>
-                    </div>
-                    <div className={styles.authorGroup}>
-                      <FiUser className={styles.IconUser} />
-                      <span>{post.data.author}</span>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            </div>
+            <PostCard post={post} key={post.uid} />
           ))}
         </div>
         {nextPage && (
